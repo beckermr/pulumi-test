@@ -8,6 +8,9 @@ auth = Auth.Token(os.environ["GH_PAT"])
 # Public Web Github
 gh = Github(auth=auth)
 
-repo = gh.get_repo("beckermr/cv")
+found_private = False
+for repo in gh.get_repos():
+    if repo.private:
+        found_private = True
 
-print(repo)
+print("found private?", found_private, flush=True)
