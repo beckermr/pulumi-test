@@ -1,0 +1,38 @@
+name: tests
+
+on:
+  workflow_dispatch: null
+  push:
+    branches:
+      - main
+  pull_request: null
+
+jobs:
+  tests:
+    name: tests
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.11
+          channels: conda-forge,defaults
+          channel-priority: strict
+          show-channel-urls: true
+          miniforge-version: latest
+          miniforge-variant: Mambaforge
+
+      - name: configure conda and install code
+        shell: bash -l {0}
+        run: |
+          conda config --set always_yes yes
+          mamba install --quiet pygithub
+
+      - name: test
+        shell: bash -l {0}
+        run: |
+          python test_token.py
+        env:
+          GH_PAT: ${{ secrets.pulumi_test_secret }}
